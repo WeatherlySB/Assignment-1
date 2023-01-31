@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<algorithm>
 
 
 struct Room
@@ -23,15 +24,15 @@ struct Player
 void clearConsole();
 void pauseConsole();
 void splashScreen();
-void displayGameState(Player, std::vector<Room> map);
-displayGameDone;
-displayIllegalMove;
-getAction;
+void displayGameState(Player player, std::vector<Room> map);
+void displayGameDone(Player player, std::vector<Room> map);
+std::string displayIllegalMove(Player player, Room::Direction action);
+Room::Direction getAction();
 
 /* Engine Functions*/
 std::vector<Room> buildMap();
-randomizeKey;
-changeGameState;
+void randomizeKey();
+int changeGameState(Room::Direction action, Player player, std::vector<Room> map);
 bool gameIsNotDone(Player);
 
 int main() {
@@ -145,8 +146,12 @@ void splashScreen() {
 	pauseConsole();
 }
 
+
+//setting these as void or int temporarily, may change later
+
 //randomly place the key in either the cell, the armory, the jailer's barrack, or the gate room.
-randomizeKey //you will need to decide on the return type and parameters!
+//SETTING THIS TO VOID FOR NOW
+void randomizeKey() //you will need to decide on the return type and parameters!
 {
 
 }
@@ -154,40 +159,100 @@ randomizeKey //you will need to decide on the return type and parameters!
 //output information as demonstrated in the instructions.
 //You will need to deal with display changes that depend on the key.
 //NOTE:: NO game variables such as the player or rooms should be modified in this function!!!
-void displayGameState(Player, std::vector<Room> map)
+void displayGameState(Player player, std::vector<Room> map)
 {
+	while (player.health > 0)
+	{
+		
+		std::cout << " View: "   << '\n';
+		std::cout << " Health: " << player.health << '\n';
+		std::cout << " Equip: " << '\n' << '\n';
+		std::cout << " Select Action: \n";
+		std::cout << "          (North)          " << std::endl;
+		std::cout << "             w             " << std::endl;
+		std::cout << "             |             " << std::endl;
+		std::cout << "  (West) a --+-- d (East)  " << std::endl;
+		std::cout << "             |             " << std::endl;
+		std::cout << "             s             " << std::endl;
+		std::cout << "          (South)          " << std::endl;
+		if (getAction() == Room::Direction::S)
+		{
+			std::cout << "DOG DOG DOG\n";
+		
+			player.health--;
+
+		}
+		
+
+
+	}
+	displayGameDone(player, map);
+	system("PAUSE");
 
 
 }
 //output messages depending on if the player has one or lost.
-displayGameDone
+ void displayGameDone(Player player, std::vector<Room> map)
 {
-
+	 if (player.health == 0)
+	 {
+		 std::cout << " BUMMER, YOU DIED . . . RIP.\n";
+	 }
+	
 
 }
 
 //output illegal move messages depending if player tries to exit without the key
 //or the player tries to exit the wrong way out of a room.
-displayIllegalMove
+std::string displayIllegalMove (Player player, Room::Direction action)
 {
 
-
+	return "NOPE"; //FOR NOW
 }
+
+
 
 //ask for user input, convert char to Room::Direction
-getAction
+Room::Direction getAction()
 {
+	char move{ 'x' };
+	std::cin >> move;
+	switch (move)
+	{
+	case 'w':
+	case 'W':
+		return Room::Direction::N;
+		//break;
+	case 'a':
+	case 'A':
+		return Room::Direction::W;
+		//break;
+	case 's':
+	case 'S':
+		return Room::Direction::S;
+		//break;
+	case 'd':
+	case 'D':
+		return Room::Direction::E;
+		//break;
+	default:
+		return Room::Direction::none;
+		//break;
 
+	}
 }
+
+
+
 
 //This function is the only one that should make modifications to the player/rooms including picking up the key.
 // This function should call other functions in order to display illegal moves and/or move the player to a new room.
 // If the player moves to a new room, health needs to be decremented.
 // Look at int main to decide on return type.
-
-changeGameState
+//SETTING AS INT FOR NOW
+int changeGameState(Room::Direction action, Player player, std::vector<Room> map)
 {
-
+	return 2; //FOR NOW
 }
 
 
@@ -196,5 +261,6 @@ changeGameState
 //of health or the player has reached the exit
 bool gameIsNotDone(Player)
 {
-	//
+
+	return true; //FOR NOW
 }
