@@ -177,9 +177,9 @@ void displayGameState(Player player, std::vector<Room> map)
 		std::cout << "          (South)          " << std::endl;
 		if (getAction() == Room::Direction::S)
 		{
-			std::cout << "DOG DOG DOG\n";
+			player.
 		
-			player.health--;
+			
 
 		}
 		
@@ -194,12 +194,14 @@ void displayGameState(Player player, std::vector<Room> map)
 //output messages depending on if the player has one or lost.
  void displayGameDone(Player player, std::vector<Room> map)
 {
-	 if (player.health == 0)
+	 if (player.health == 0 && !player.hasKey)
 	 {
 		 std::cout << " BUMMER, YOU DIED . . . RIP.\n";
 	 }
-	
-
+	 else
+	 {
+		 std::cout << "YOU FOUND THE KEY AND ESCAPED! \n";
+	 }
 }
 
 //output illegal move messages depending if player tries to exit without the key
