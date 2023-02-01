@@ -24,9 +24,9 @@ struct Player
 void clearConsole();
 void pauseConsole();
 void splashScreen();
-void displayGameState(Player player, std::vector<Room> map);
+void displayGameState(Player player, std::vector<Room> &map, Room location);
 void displayGameDone(Player player, std::vector<Room> map);
-std::string displayIllegalMove(Player player, Room::Direction action);
+void displayIllegalMove(Player player, Room::Direction action);
 Room::Direction getAction();
 
 /* Engine Functions*/
@@ -44,6 +44,7 @@ int main() {
 	/*set up game*/
 	std::vector<Room> map{ buildMap() };
 	Player player;
+	Room location;
 
 	/*Until Game Termination Condition*/
 	while (gameIsNotDone(player))
@@ -51,10 +52,12 @@ int main() {
 
 		/*Display Game State*/
 		clearConsole();
-		displayGameState(player, map);
+		displayGameState(player, map, location);
 
 		/*Collect Player Action*/
 		Room::Direction action{ getAction() };
+
+
 
 		/*Update Game State*/
 		if (!changeGameState(action, player, map))
@@ -69,11 +72,6 @@ int main() {
 	return 0;
 
 }
- /*
-		CELL(START) - GATE -need key- EXIT
-		|              |
-		ARMORY - JAILER'S KEY
- */
 
 std::vector<Room> buildMap()
 {
@@ -159,12 +157,12 @@ void randomizeKey() //you will need to decide on the return type and parameters!
 //output information as demonstrated in the instructions.
 //You will need to deal with display changes that depend on the key.
 //NOTE:: NO game variables such as the player or rooms should be modified in this function!!!
-void displayGameState(Player player, std::vector<Room> map)
+void displayGameState(Player player, std::vector<Room>& map, Room location)
 {
-	while (player.health > 0)
-	{
-		
-		std::cout << " View: "   << '\n';
+	
+	
+	
+		std::cout << " View: "  << '\n';
 		std::cout << " Health: " << player.health << '\n';
 		std::cout << " Equip: " << '\n' << '\n';
 		std::cout << " Select Action: \n";
@@ -175,28 +173,23 @@ void displayGameState(Player player, std::vector<Room> map)
 		std::cout << "             |             " << std::endl;
 		std::cout << "             s             " << std::endl;
 		std::cout << "          (South)          " << std::endl;
-		if (getAction() == Room::Direction::S)
-		{
-			player.
 		
-			
-
-		}
-		
-
-
-	}
-	displayGameDone(player, map);
-	system("PAUSE");
+	
+	//displayGameDone(player, map);
+	
 
 
 }
 //output messages depending on if the player has one or lost.
  void displayGameDone(Player player, std::vector<Room> map)
 {
-	 if (player.health == 0 && !player.hasKey)
+	 if (player.health == 0)
 	 {
 		 std::cout << " BUMMER, YOU DIED . . . RIP.\n";
+	 }
+	 else if (player.health > 0 && player.currentRoom != Room::Name::armory && player.currentRoom != Room::Name::gate)
+	 {
+		 return;
 	 }
 	 else
 	 {
@@ -206,10 +199,10 @@ void displayGameState(Player player, std::vector<Room> map)
 
 //output illegal move messages depending if player tries to exit without the key
 //or the player tries to exit the wrong way out of a room.
-std::string displayIllegalMove (Player player, Room::Direction action)
+void displayIllegalMove (Player player, Room::Direction action)
 {
 
-	return "NOPE"; //FOR NOW
+	std::cout << "Wrong direction . . . \n";
 }
 
 
@@ -218,30 +211,32 @@ std::string displayIllegalMove (Player player, Room::Direction action)
 Room::Direction getAction()
 {
 	char move{ 'x' };
-	std::cin >> move;
+	std::cin.get(move);
+	Room::Direction chosenDirection;
 	switch (move)
 	{
 	case 'w':
 	case 'W':
-		return Room::Direction::N;
-		//break;
+		chosenDirection = Room::Direction::N;
+		break;
 	case 'a':
 	case 'A':
-		return Room::Direction::W;
-		//break;
+		chosenDirection =  Room::Direction::W;
+		break;
 	case 's':
 	case 'S':
-		return Room::Direction::S;
-		//break;
+		chosenDirection = Room::Direction::S;
+		break;
 	case 'd':
 	case 'D':
-		return Room::Direction::E;
-		//break;
+		chosenDirection = Room::Direction::E;
+		break;
 	default:
-		return Room::Direction::none;
-		//break;
-
+		chosenDirection = Room::Direction::none;
+		break;
 	}
+	return chosenDirection;
+
 }
 
 
@@ -254,7 +249,35 @@ Room::Direction getAction()
 //SETTING AS INT FOR NOW
 int changeGameState(Room::Direction action, Player player, std::vector<Room> map)
 {
-	return 2; //FOR NOW
+	Room::Direction currentDirection{ Room::Direction::N };
+	const int TOTAL_DIRECTIONS = 4;
+	const std::vector<Room::Direction> dir = { Room::Direction::N, Room::Direction::E, Room::Direction::S, Room::Direction::W };
+	const std::vector<std::vector<int>> move = {
+	   {0, 1}, //NORTH
+	   {-1, 0}, //EAST
+	   {0, -1}, //SOUTH
+	   {1, 0}//WEST
+	};
+
+
+
+	/*
+	switch (action)
+	{
+	case Room::Direction::N:
+		break;
+	case Room::Direction::E:
+		break;
+	case Room::Direction::S:
+		break;
+	case Room::Direction::W:
+		break;
+	deafult:
+		Room::Direction::none;
+
+	}
+	*/
+	return 2;
 }
 
 
