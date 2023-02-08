@@ -13,6 +13,7 @@ struct Room
 	//NOTE:: these two vectors will eventually become a std::map after the STL level.
 	bool hasKey{ false }; //whether or not the player has picked up the key.
 };
+
 //struct keeps track of the room the player is in, their health, and rather or not they have picked up the key.
 struct Player
 {
@@ -21,7 +22,7 @@ struct Player
 	bool hasKey{ false };
 };
 /* GUI Functions */
-void clearConsole();
+void clearConsole();  
 void pauseConsole();
 void splashScreen();
 void displayGameState(Player player, std::vector<Room> &map, Room location);
@@ -32,13 +33,13 @@ Room::Direction getAction();
 /* Engine Functions*/
 std::vector<Room> buildMap();
 void randomizeKey();
-bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& map);
+bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& map, Room location);
 bool gameIsNotDone(Player);
 
 int main() {
 
 	/*Splash Screen*/
-	clearConsole();
+ //	clearConsole(); ---------------------------------------------------- put back later -----------------------
 	splashScreen();
 
 	/*set up game*/
@@ -47,23 +48,19 @@ int main() {
 	Room location;
 	
 	
-
-
 	/*Until Game Termination Condition*/
 	while (gameIsNotDone(player))
 	{
 
 		/*Display Game State*/
-		clearConsole();
+	//	clearConsole();
 		displayGameState(player, map, location);
 
 		/*Collect Player Action*/
 		Room::Direction action{ getAction() };
 
-
-
 		/*Update Game State*/
-		if (!changeGameState(player, action, map))
+		if (!changeGameState(player, action, map, location))
 		{
 			displayIllegalMove(player, action);
 		}
@@ -162,12 +159,12 @@ void randomizeKey() //you will need to decide on the return type and parameters!
 //NOTE:: NO game variables such as the player or rooms should be modified in this function!!!
 void displayGameState(Player player, std::vector<Room>& map, Room location)
 {
-	if (player.health == 10 && player.currentRoom == Room::Name::cell)
+	if (player.health == 10)
 	{
-		Room current = map.at(0);
-		std::cout << "View: " << current.message << std::endl;
+		location = map[0];
 	}
-
+	
+		std::cout << " View: " << location.message << '\n';
 		std::cout << " Health: " << player.health << '\n';
 		std::cout << " Equip: " << '\n' << '\n';
 		std::cout << " Select Action: \n";
@@ -178,6 +175,8 @@ void displayGameState(Player player, std::vector<Room>& map, Room location)
 		std::cout << "             |             " << std::endl;
 		std::cout << "             s             " << std::endl;
 		std::cout << "          (South)          " << std::endl;
+	
+
 
 	displayGameDone(player, map);
 	
@@ -191,11 +190,11 @@ void displayGameState(Player player, std::vector<Room>& map, Room location)
 	 {
 		 std::cout << " BUMMER, YOU DIED . . . RIP.\n";
 	 }
-	 else if (player.health > 0 && player.currentRoom != Room::Name::armory && player.currentRoom != Room::Name::gate)
+	 else if (player.health > 0 && player.currentRoom != Room::Name::exit)
 	 {
 		 return;
 	 }
-	 else if (player.health > 0 && player.currentRoom == Room::Name::armory && player.currentRoom == Room::Name::gate)
+	 else if (player.health > 0 && player.currentRoom == Room::Name::exit)
 	 {
 		 std::cout << "YOU FOUND THE KEY AND ESCAPED! \n";
 	 }
@@ -218,55 +217,38 @@ Room::Direction getAction()
 {
 	char move{ 'x' };
 	std::cin >> move;
-	Room::Direction chosenDirection;
 	switch (move)
 	{
 	case 'w':
 	case 'W':
-		chosenDirection = Room::Direction::N;
-		std::cout << "North\n";
-		break;
+		return Room::Direction::N;
 	case 'a':
 	case 'A':
-		chosenDirection =  Room::Direction::W;
-		std::cout << "West\n";
-		break;
+		return Room::Direction::W;
 	case 's':
 	case 'S':
-		chosenDirection = Room::Direction::S;
-		std::cout << "South\n";
-		break;
+		return Room::Direction::S;
 	case 'd':
 	case 'D':
-		chosenDirection = Room::Direction::E;
-		std::cout << "East\n";
-		break;
+	   return Room::Direction::E;
 	default:
-		chosenDirection = Room::Direction::none;
-		std::cout << "Wrong way\n";
-		break;
+		return Room::Direction::none;
 	}
-	return chosenDirection;
-
 }
-
-
 
 
 //This function is the only one that should make modifications to the player/rooms including picking up the key.
 // This function should call other functions in order to display illegal moves and/or move the player to a new room.
 // If the player moves to a new room, health needs to be decremented.
 // Look at int main to decide on return type.
-//SETTING AS INT FOR NOW
-bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& map)
+//change return values
+bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& map, Room location)
 {
-	//movements with action
-	Room current = map.at(0); // Start in the cell
-	//simple set up
-	while (player.currentRoom != Room::Name::exit)
+	displayGameState(player, map, location);
+	while (player.currentRoom != Room::Name::exit && !location.hasKey)
 	{
-		std::cout << "view: " << current.message << std::endl;
-		if (current.hasKey)
+		
+		if (location.hasKey)
 		{
 			std::cout << "You have picked up the key!" << std::endl;
 			break;
@@ -274,46 +256,68 @@ bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& 
 		// Go to the armory
 		else if (player.currentRoom == Room::Name::cell)
 		{
-			for (int i = 0; i < current.connectedRoom.size(); i++)
-			{
-				if (current.connectedRoom[i] == Room::Name::armory) {
-					current = map[i];
+		//	for (int i = 0; i < location.connectedRoom.size(); i++)
+		//	{
+			if (action == Room::Direction::E) { player.currentRoom == Room::Name::gate; break; }
+			else if (action == Room::Direction::S) { player.currentRoom == Room::Name::armory; break; }
+				else if (action == Room::Direction::N || action == Room::Direction::W) { std::cout << "Wrong turn\n"; }
+
+				/*
+				if (location.connectedRoom[i] == Room::Name::armory) {
+					location = map[i];
+					std::cout << "In armory\n";
 					break;
 				}
-			}
+				*/
+		//	}
+
 		}
 		//go to exit
 		else if (player.currentRoom == Room::Name::gate)
 		{
-			for (int i = 0; i < current.connectedRoom.size(); i++)
+			if (player.hasKey)
 			{
-				if (current.connectedRoom[i] == Room::Name::exit) {
-					current = map[i];
+				player.currentRoom == Room::Name::exit;
+				return true;
+			}
+			else
+			{
+				std::cout << "You need the key to exit...\n";
+				if (action == Room::Direction::W) { player.currentRoom == Room::Name::cell; break; }
+				if (action == Room::Direction::S) { player.currentRoom == Room::Name::jailers; }
+				if (action == Room::Direction::N || action == Room::Direction::E) { std::cout << "Wrong turn\n"; }
+			}
+			/*
+			for (int i = 0; i < location.connectedRoom.size(); i++)
+			{
+				if (location.connectedRoom[i] == Room::Name::exit) {
+					location = map[i];
+					std::cout << "In gate exit\n";
 					break;
 				}
 			}
+			*/
 		}
 		// Go to the jailers room
 		else if (player.currentRoom == Room::Name::armory)
 		{
-			for (int i = 0; i < current.connectedRoom.size(); i++)
-			{
-				if (current.connectedRoom[i] == Room::Name::jailers)
-				{
-					current = map[i];
-					break;
-				}
-			}
+			
+			if (action == Room::Direction::N) { player.currentRoom == Room::Name::cell; }
+			if (action == Room::Direction::E) { player.currentRoom == Room::Name::jailers; }
+			if (action == Room::Direction::S || action == Room::Direction::W) { std::cout << "Wrong turn\n"; }			
 		}
+		//Gate to exit
 		if (player.currentRoom == Room::Name::jailers)
 		{
-			for (int i = 0; i < current.connectedRoom.size(); i++)
+			/*
+			for (int i = 0; i < location.connectedRoom.size(); i++)
 			{
-				if (current.connectedRoom[i] == Room::Name::gate) {
-					current = map[i];
+				if (location.connectedRoom[i] == Room::Name::gate) {
+					location = map[i];
 					break;
 				}
 			}
+			*/
 		}
 		player.health--;
 		system("PAUSE");
@@ -326,8 +330,8 @@ bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& 
 
 //Check the end-of-game conditions.  i.e If the player is out
 //of health or the player has reached the exit
-bool gameIsNotDone(Player)
+bool gameIsNotDone(Player player)
 {
-
-	return true; //FOR NOW
+	if (player.health <= 0) { return false; }
+	if (player.health > 0 || player.currentRoom != Room::Name::exit) { return true; }
 }
