@@ -55,6 +55,8 @@ int main() {
 		/*Display Game State*/
 		clearConsole();
 		displayGameState(player, map, location);
+
+		//hasKey = true here
 		
 
 		/*Collect Player Action*/
@@ -207,9 +209,16 @@ void displayGameState(Player player, std::vector<Room>& map, Room location)
 	 }
 	 else if (player.health > 0 && player.currentRoom == Room::Name::exit)
 	 {
-		 if (player.hasKey = false)
+		// if (player.hasKey = true)
+		 //{
+			// std::cout << "YOU FOUND THE KEY AND ESCAPED! \n";
+		 //}
+		 if (player.hasKey = true)
 		 {
-			 std::cout << "YOU FOUND THE KEY AND ESCAPED! \n";
+			 std::cout << "YES key\n";
+		 }
+		 if (player.hasKey = false) {
+			 std::cout << "NO KEY\n";
 		 }
 		
 	 }
@@ -222,8 +231,15 @@ void displayGameState(Player player, std::vector<Room>& map, Room location)
 void displayIllegalMove (Player player, Room::Direction action)
 {
 	//if going wrong direction
+	//if player does not move
+	//default answer
 	std::cout << "Wrong direction . . . \n";
 
+	//if going east and player.hasKey is not there
+	if (action == Room::Direction::E && player.hasKey)
+	{
+		std::cout << "You need the key to leave. . .\n";
+	}
 	
 }
 
@@ -262,7 +278,6 @@ bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& 
 {
 		int currentIndex = static_cast<int>(player.currentRoom);
 
-		
 
 		for (int i = 0; i < map[currentIndex].doors.size(); i++) {
 			if (map[currentIndex].doors[i] == action) {
@@ -279,6 +294,8 @@ bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& 
 
 		}
 		
+		//if currentRoom has the key 
+		//set player hasKey to have value of having key
 
 
 	//	displayGameState(player, map, location);
@@ -292,4 +309,5 @@ bool gameIsNotDone(Player player)
 {
 	if (player.health <= 0) { return false; }
 	if (player.health > 0 || player.currentRoom != Room::Name::exit) { return true; }
+	if (!player.hasKey && player.currentRoom == Room::Name::exit) { return false;  }
 }
