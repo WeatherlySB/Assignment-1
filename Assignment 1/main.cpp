@@ -160,7 +160,13 @@ void randomizeKey() //you will need to decide on the return type and parameters!
 //NOTE:: NO game variables such as the player or rooms should be modified in this function!!!
 void displayGameState(Player player, std::vector<Room>& map, Room location)
 {
-	
+	if (player.hasKey = true)
+	{
+		std::cout << "YES key\n";
+	}
+	if (player.hasKey = false) {
+		std::cout << "NO KEY\n";
+	}
 	if (player.health == 10)
 	{
 		location = map[0];
@@ -168,7 +174,7 @@ void displayGameState(Player player, std::vector<Room>& map, Room location)
 		std::cout << " View: " << map[static_cast<int>(player.currentRoom)].message << '\n';
 		std::cout << " Health: " << player.health << '\n';
 		std::cout << " Equip: ";
-		if (player.hasKey) {
+		if (player.hasKey = false) {
 			std::cout << "Jailer's Key";
 		}
 		std::cout << '\n' << '\n';
@@ -201,7 +207,11 @@ void displayGameState(Player player, std::vector<Room>& map, Room location)
 	 }
 	 else if (player.health > 0 && player.currentRoom == Room::Name::exit)
 	 {
-		 std::cout << "YOU FOUND THE KEY AND ESCAPED! \n";
+		 if (player.hasKey = false)
+		 {
+			 std::cout << "YOU FOUND THE KEY AND ESCAPED! \n";
+		 }
+		
 	 }
 	 else
 		return;
@@ -211,8 +221,10 @@ void displayGameState(Player player, std::vector<Room>& map, Room location)
 //or the player tries to exit the wrong way out of a room.
 void displayIllegalMove (Player player, Room::Direction action)
 {
-
+	//if going wrong direction
 	std::cout << "Wrong direction . . . \n";
+
+	
 }
 
 
@@ -250,124 +262,29 @@ bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& 
 {
 		int currentIndex = static_cast<int>(player.currentRoom);
 
+		
+
 		for (int i = 0; i < map[currentIndex].doors.size(); i++) {
 			if (map[currentIndex].doors[i] == action) {
 				auto connectedRoom = map[currentIndex].connectedRoom[i];
 				player.health--;
 				player.currentRoom = connectedRoom;
 				location = map[static_cast<int>(connectedRoom)];
-				//std::cout << location.message << '\n';
-
 				return true;
 			}
+			if (map[currentIndex].doors[i] != action)
+			{
+				displayIllegalMove(player, action);
+			}
+
 		}
+		
 
 
-		/*
-			if (player.currentRoom == map[0].connectedRoom[1]) //CELL
-			{
-				std::cout << "Inside cell\n";
-				
-				for (int i = 0; i < location.connectedRoom.size(); i++)
-				{
-				if (action == Room::Direction::E) //to gate
-				{
-						currentIndex = 1;
-						player.currentRoom = map[currentIndex].connectedRoom[i];
-						
-						std::cout << location.message << '\n';
-					
-				}
-				else if (action == Room::Direction::S) //to armory
-				{
-					currentIndex = 2;
-					player.currentRoom = map[currentIndex].connectedRoom[i];
-					location = map[2];
-					
-				}
-				else if (action == Room::Direction::N || action == Room::Direction::W)
-				{
-					std::cout << "Wrong turn\n";
-				}
-				}
-
-			}
-			*/
-
-			/*
-			//go to exit
-			else if (player.currentRoom == Room::Name::gate)
-			{
-				if (player.hasKey)
-				{
-					player.currentRoom == Room::Name::exit;
-					return true;
-				}
-				else
-				{
-					std::cout << "You need the key to exit...\n";
-					if (action == Room::Direction::W)
-					{
-						player.currentRoom == Room::Name::cell;
-						break;
-					}
-					if (action == Room::Direction::S) { player.currentRoom == Room::Name::jailers; }
-					if (action == Room::Direction::N || action == Room::Direction::E) { std::cout << "Wrong turn\n"; }
-				}
-				/*
-				for (int i = 0; i < location.connectedRoom.size(); i++)
-				{
-					if (location.connectedRoom[i] == Room::Name::exit) {
-						location = map[i];
-						std::cout << "In gate exit\n";
-						break;
-					}
-				}
-
-			}
-			// Go to the jailers room
-			else if (player.currentRoom == Room::Name::armory)
-			{
-
-				if (action == Room::Direction::N) { player.currentRoom == Room::Name::cell; }
-				if (action == Room::Direction::E) { player.currentRoom == Room::Name::jailers; }
-				if (action == Room::Direction::S || action == Room::Direction::W) { std::cout << "Wrong turn\n"; }
-			}
-			//Gate to exit
-			if (player.currentRoom == Room::Name::jailers)
-			{
-				/*
-				for (int i = 0; i < location.connectedRoom.size(); i++)
-				{
-					if (location.connectedRoom[i] == Room::Name::gate) {
-						location = map[i];
-						break;
-					}
-				}
-
-			}
-
-
-		*/
-
-
-
-		//	return 0;
-			//	if (player.currentRoom == map[0].connectedRoom[1]) { std::cout << location.message << "IN GATE" << '\n'; }
-			//	if (player.currentRoom == map[1].connectedRoom[0]) { std::cout << location.message << '\n'; }
-			//	if (player.currentRoom == map[3].connectedRoom[2]) { std::cout << location.message << '\n'; }
-			//	if (player.currentRoom == map[0].connectedRoom[1]) { std::cout << location.message << '\n'; }
-		//		system("PAUSE");
-			//std::cout << "ChangeGameState\n";
-		displayGameState(player, map, location);
+	//	displayGameState(player, map, location);
 		
 			return false;
 }
-
-		
-
-	
-
 
 //Check the end-of-game conditions.  i.e If the player is out
 //of health or the player has reached the exit
