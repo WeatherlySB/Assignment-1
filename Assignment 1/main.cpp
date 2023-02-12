@@ -181,6 +181,7 @@ void randomizeKey(std::vector<Room>& map) //you will need to decide on the retur
 void displayGameState(Player player, std::vector<Room>& map, Room location)
 {
 	//hasKey = true here
+	
 	if (player.health == 10)
 	{
 		location = map[0];
@@ -216,19 +217,22 @@ void displayGameState(Player player, std::vector<Room>& map, Room location)
 		 std::cout << " BUMMER, YOU DIED . . . RIP.\n";
 	 }
 	
-	 else if (player.health > 0 && player.currentRoom == Room::Name::exit)
+	 else if (player.health > 0 && player.currentRoom == Room::Name::exit && !player.hasKey)
 	 {
+		 return;
 	 
 	//hasKey = true here
+		 /*
 		 if (!player.hasKey)
 		 {
 			 std::cout << "Go back for the key...\n";
 		 }
-		 if (player.hasKey)
+		 
+		 else if (player.hasKey )
 		 {
 			 std::cout << "YOU FOUND THE KEY AND ESCAPED! \n";
 		 }
-		 
+		 */
 		
 	 }
 	 else
@@ -245,6 +249,7 @@ void displayIllegalMove (Player player, Room::Direction action)
 	if (action == Room::Direction::none)
 	{
 		std::cout << "Wrong direction . . . \n";
+		pauseConsole();
 	}
 
 	//if going east and player.hasKey is not there
@@ -252,7 +257,7 @@ void displayIllegalMove (Player player, Room::Direction action)
 	{
 		std::cout << "You need the key to leave. . .\n";
 	}
-	system("PAUSE");
+	//system("PAUSE");
 	
 }
 
@@ -290,51 +295,51 @@ Room::Direction getAction()
 bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& map, Room location)
 {
 	randomizeKey(map);
-		int currentIndex = static_cast<int>(player.currentRoom);
+	int currentIndex = static_cast<int>(player.currentRoom);
 
 
-		if (map[currentIndex].hasKey) {
-			std::cout << "You found the key, now you just have to find the exit...\n";
-			player.hasKey = true;
-			map[currentIndex].hasKey = false;
-			system("PAUSE");
+	if (map[currentIndex].hasKey) {
+		std::cout << "You found the key, now you just have to find the exit...\n";
+		player.hasKey = true;
+		map[currentIndex].hasKey = false;
+		system("PAUSE");
+	}
+
+	if (player.currentRoom == map[3].connectedRoom[1]) { player.hasKey = true; }
+
+
+	for (int i = 0; i < map[currentIndex].doors.size(); i++) {
+
+		if (map[currentIndex].doors[i] == action) {
+			auto connectedRoom = map[currentIndex].connectedRoom[i];
+			player.health--;
+			player.currentRoom = connectedRoom;
+			location = map[static_cast<int>(connectedRoom)];
+			return true;
+		}
+		//if (map[currentIndex].doors[i] != action)
+		else
+		{
+			displayIllegalMove(player, action);
 		}
 
-		if (player.currentRoom == map[3].connectedRoom[1]) { player.hasKey = true; }
+	}
+
+	//if currentRoom has the key 
+	//set player hasKey to have value of having key
 
 
-		for (int i = 0; i < map[currentIndex].doors.size(); i++) {
-			
-			if (map[currentIndex].doors[i] == action) {
-				auto connectedRoom = map[currentIndex].connectedRoom[i];
-				player.health--;
-				player.currentRoom = connectedRoom;
-				location = map[static_cast<int>(connectedRoom)];
-				return true;
-			}
-			//if (map[currentIndex].doors[i] != action)
-			else
-			{
-				action == Room::Direction::none ;
-				displayIllegalMove(player, action);
-			}
-			
-		}
-		
-		//if currentRoom has the key 
-		//set player hasKey to have value of having key
+//	displayGameState(player, map, location);
 
-
-	//	displayGameState(player, map, location);
-		
-			return false;
+	return false;
 }
+
 
 //Check the end-of-game conditions.  i.e If the player is out
 //of health or the player has reached the exit
 bool gameIsNotDone(Player player)
 {
 	if (player.health <= 0) { return false; }
-	if (player.health > 0 || player.currentRoom != Room::Name::exit) { return true; }
+	if (player.health > 0 || player.currentRoom != Room::Name::exit) { return true; }	
 	if (!player.hasKey && player.currentRoom == Room::Name::exit) { return false;  }
 }
