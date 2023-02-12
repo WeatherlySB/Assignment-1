@@ -1,7 +1,22 @@
 #include<iostream>
 #include<vector>
 #include<algorithm>
+#include<random>
 
+std::random_device dv;
+std::mt19937 mt(dv());
+
+
+/* testing key value
+if (player.hasKey = true) {
+		std::cout << "TRUE key\n";
+	}
+	if (player.hasKey = false) {
+		std::cout << "FALSE key\n";
+	}
+	system("PAUSE");
+
+*/
 
 struct Room
 {
@@ -32,7 +47,7 @@ Room::Direction getAction();
 
 /* Engine Functions*/
 std::vector<Room> buildMap();
-void randomizeKey();
+void randomizeKey(std::vector<Room>& map);
 bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& map, Room location);
 bool gameIsNotDone(Player);
 
@@ -40,6 +55,7 @@ int main() {
 
 	/*Splash Screen*/
  	clearConsole(); 
+	
 	splashScreen();
 
 	/*set up game*/
@@ -47,11 +63,16 @@ int main() {
 	Player player;
 	Room location;
 	
+	//hasKey = true here
+
+	
+	
 	
 	/*Until Game Termination Condition*/
 	while (gameIsNotDone(player))
 	{
-
+		//hasKey = true here
+		
 		/*Display Game State*/
 		clearConsole();
 		displayGameState(player, map, location);
@@ -148,13 +169,14 @@ void splashScreen() {
 }
 
 
-//setting these as void or int temporarily, may change later
-
 //randomly place the key in either the cell, the armory, the jailer's barrack, or the gate room.
-//SETTING THIS TO VOID FOR NOW
-void randomizeKey() //you will need to decide on the return type and parameters!
+void randomizeKey(std::vector<Room>& map) //you will need to decide on the return type and parameters!
 {
-
+	std::uniform_int_distribution<int>ran(0, 3);
+	//room 1-3 or 1-4
+	int randRoom = ran(dv);
+	map[randRoom].hasKey = true;
+	
 }
 
 //output information as demonstrated in the instructions.
@@ -162,13 +184,7 @@ void randomizeKey() //you will need to decide on the return type and parameters!
 //NOTE:: NO game variables such as the player or rooms should be modified in this function!!!
 void displayGameState(Player player, std::vector<Room>& map, Room location)
 {
-	if (player.hasKey = true)
-	{
-		std::cout << "YES key\n";
-	}
-	if (player.hasKey = false) {
-		std::cout << "NO KEY\n";
-	}
+	//hasKey = true here
 	if (player.health == 10)
 	{
 		location = map[0];
@@ -209,17 +225,21 @@ void displayGameState(Player player, std::vector<Room>& map, Room location)
 	 }
 	 else if (player.health > 0 && player.currentRoom == Room::Name::exit)
 	 {
-		// if (player.hasKey = true)
-		 //{
-			// std::cout << "YOU FOUND THE KEY AND ESCAPED! \n";
-		 //}
-		 if (player.hasKey = true)
+	 
+	  if (player.hasKey = true)
+	 {
+		 std::cout << "TRUE key\n";
+
+	 }
+	 if (player.hasKey = false) {
+		 std::cout << "FALSE KEY\n";
+	 }
+
+		 if (player.hasKey = false)
 		 {
-			 std::cout << "YES key\n";
+			 std::cout << "YOU FOUND THE KEY AND ESCAPED! \n";
 		 }
-		 if (player.hasKey = false) {
-			 std::cout << "NO KEY\n";
-		 }
+		 
 		
 	 }
 	 else
@@ -236,7 +256,7 @@ void displayIllegalMove (Player player, Room::Direction action)
 	std::cout << "Wrong direction . . . \n";
 
 	//if going east and player.hasKey is not there
-	if (action == Room::Direction::E && player.hasKey)
+	if (action == Room::Direction::E && !player.hasKey)
 	{
 		std::cout << "You need the key to leave. . .\n";
 	}
@@ -276,10 +296,22 @@ Room::Direction getAction()
 // Look at int main to decide on return type./
 bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& map, Room location)
 {
+	randomizeKey(map);
 		int currentIndex = static_cast<int>(player.currentRoom);
 
 
+		if (map[currentIndex].hasKey) {
+			std::cout << "You found the key, now you just have to find the exit...\n";
+			player.hasKey = true;
+			map[currentIndex].hasKey = false;
+			system("PAUSE");
+		}
+
+		if (player.currentRoom == map[3].connectedRoom[1]) { player.hasKey = true; }
+
+
 		for (int i = 0; i < map[currentIndex].doors.size(); i++) {
+			
 			if (map[currentIndex].doors[i] == action) {
 				auto connectedRoom = map[currentIndex].connectedRoom[i];
 				player.health--;
@@ -287,11 +319,12 @@ bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& 
 				location = map[static_cast<int>(connectedRoom)];
 				return true;
 			}
-			if (map[currentIndex].doors[i] != action)
+			//if (map[currentIndex].doors[i] != action)
+			else
 			{
 				displayIllegalMove(player, action);
 			}
-
+			
 		}
 		
 		//if currentRoom has the key 
