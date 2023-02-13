@@ -298,15 +298,49 @@ bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& 
 	int currentIndex = static_cast<int>(player.currentRoom);
 
 
-	if (map[currentIndex].hasKey) {
-		std::cout << "You found the key, now you just have to find the exit...\n";
-		player.hasKey = true;
-		map[currentIndex].hasKey = false;
-		system("PAUSE");
+	player.health--;
+	
+	for (int i = 0; i < map[currentIndex].doors.size(); i++) {
+
+		auto connectedRoom = map[currentIndex].connectedRoom[i];
+		if (connectedRoom == Room::Name::exit && player.hasKey) {
+			if (player.hasKey = false)
+			{
+				std::cout << "You need the key to unlock the exit!" << '\n';
+				return false;
+			}
+			
+			// Player is blocked from going to the exit without key
+			
+		}
+		else {
+			// Move player to the connected room
+			
+			player.currentRoom = connectedRoom;
+			location = map[static_cast<int>(connectedRoom)];
+			if (map[currentIndex].doors[i] == action) {
+
+				return true;
+			}
+
+			//if (map[currentIndex].doors[i] != action)
+			else
+			{
+				displayIllegalMove(player, action);
+			}
+		}
+
 	}
 
-	if (player.currentRoom == map[3].connectedRoom[1]) { player.hasKey = true; }
 
+
+	/*
+	* if (map[currentIndex].hasKey) {
+		std::cout << "You found the key, now you just have to find the exit...\n";
+		player.hasKey = true;
+		//map[currentIndex].hasKey = false;
+		system("PAUSE");
+	}
 
 	for (int i = 0; i < map[currentIndex].doors.size(); i++) {
 
@@ -324,6 +358,26 @@ bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& 
 		}
 
 	}
+	*/
+	
+
+	/*
+	auto connectedRoom = map[currentIndex].connectedRoom[i];
+    if (connectedRoom == Room::Name::exit && !player.hasKey) {
+        // Player is blocked from going to the exit without key
+        cout << "You need the key to unlock the exit!" << endl;
+    } else {
+        // Move player to the connected room
+        player.health--;
+        player.currentRoom = connectedRoom;
+        location = map[static_cast<int>(connectedRoom)];
+        if (connectedRoom == Room::Name::exit) {
+            // Player has reached the exit
+            cout << "Congratulations, you've escaped!" << endl;
+            gameIsOver = true;
+        }
+    }
+	*/
 
 	//if currentRoom has the key 
 	//set player hasKey to have value of having key
@@ -335,11 +389,17 @@ bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& 
 }
 
 
+
+
 //Check the end-of-game conditions.  i.e If the player is out
 //of health or the player has reached the exit
-bool gameIsNotDone(Player player)
+bool gameIsNotDone(Player player) //false = donee
 {
 	if (player.health <= 0) { return false; }
-	if (player.health > 0 || player.currentRoom != Room::Name::exit) { return true; }	
+	if (player.currentRoom != Room::Name::gate) { 
+		if (player.hasKey = true)
+		{ return true; }
+		else if (player.hasKey = false) { return false; }
+	}	
 	if (!player.hasKey && player.currentRoom == Room::Name::exit) { return false;  }
 }
