@@ -4,7 +4,7 @@
 #include<random>
 
 std::random_device dv;
-std::mt19937 mt(dv());
+std::default_random_engine mt(dv());
 
 
 /* testing key value
@@ -165,11 +165,11 @@ void splashScreen() {
 
 
 //randomly place the key in either the cell, the armory, the jailer's barrack, or the gate room.
-void  randomizeKey(std::vector<Room>& map) //you will need to decide on the return type and parameters!
+void randomizeKey(std::vector<Room>& map) //you will need to decide on the return type and parameters!
 {
-	static std::uniform_int_distribution<int>ran;
+	  std::uniform_int_distribution<int>ran(0, 3);
 
-	const int randRoom = ran(dv) % (0, map.size()) ;
+	 int randRoom = ran(dv);
 	map[randRoom].hasKey = false;
 
 }
@@ -215,22 +215,6 @@ void displayGameDone(Player player, std::vector<Room> map)
 	{
 		std::cout << " BUMMER, YOU DIED . . . RIP.\n";
 	}
-
-	
-
-		//hasKey = true here
-			 /*
-			 if (!player.hasKey)
-			 {
-				 std::cout << "Go back for the key...\n";
-			 }
-
-			 else if (player.hasKey )
-			 {
-				 std::cout << "YOU FOUND THE KEY AND ESCAPED! \n";
-			 }
-			 */
-
 	
 	else
 		return;
@@ -240,9 +224,7 @@ void displayGameDone(Player player, std::vector<Room> map)
 //or the player tries to exit the wrong way out of a room.
 void displayIllegalMove(Player player, Room::Direction action)
 {
-	//if going wrong direction
-	//if player does not move
-	//default answer
+
 	if (action == Room::Direction::none)
 	{
 		std::cout << "Wrong direction . . . \n";
