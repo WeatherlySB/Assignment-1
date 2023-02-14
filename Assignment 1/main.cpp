@@ -62,8 +62,6 @@ int main() {
 	Player player;
 	Room location;
 
-	//hasKey = true here
-
 	/*Until Game Termination Condition*/
 	while (gameIsNotDone(player))
 	{
@@ -231,14 +229,6 @@ void displayIllegalMove(Player player, Room::Direction action)
 		pauseConsole();
 	}
 
-	/*
-	//if going east and player.hasKey is not there
-	if (action == Room::Direction::E && player.hasKey == true)
-	{
-		std::cout << "You need the key to leave. . .\n";
-	}
-	//system("PAUSE");
-	*/
 }
 
 
@@ -299,18 +289,7 @@ bool changeGameState(Player& player, Room::Direction action, std::vector<Room>& 
 				displayIllegalMove(player, action);
 			}
 		}
-		/*
-		if (map[currentIndex].connectedRoom[i] == Room::Name::exit && action == Room::Direction::E && player.hasKey == true)
-		{
 
-
-		}
-		*/
-		//if (map[currentIndex].doors[i] != action)
-		
-	
-
-//	displayGameState(player, map, location);
 
 	return false;
 }
@@ -324,5 +303,5 @@ bool gameIsNotDone(Player player) //false = donee
 {
 	if (player.health <= 0) { return false; }
 
-	//if (!player.hasKey && player.currentRoom == Room::Name::exit) { return false; }
+
 }
